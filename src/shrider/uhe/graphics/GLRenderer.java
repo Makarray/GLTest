@@ -9,11 +9,11 @@ import android.opengl.GLU;
 
 public class GLRenderer implements Renderer {
 
-	private float[] light0Amb;
-	private float[] light0Dif;
-	private float[] light0Pos;
-	private float[] matAmb;
-	private float[] matSpec;
+	private float[] light0Amb = {.4f, .4f, .4f, 1f};
+	private float[] light0Dif = {1f, 1f, 1f, 1f};
+	private float[] light0Pos = {0f, 0f, 0f, 1f};
+	private float[] matAmb = {.3f, .3f, .3f, 1f};
+	private float[] matSpec = {.7f, 1f, .7f, 1f};
 	
 	private float[] transRot;
 	private float[] transTran;
@@ -21,13 +21,21 @@ public class GLRenderer implements Renderer {
 	
 	private float[] cfWorld;
 	
+	private float[] arrVer;
+	private float[] arrDraw;
+	private float[] arrNorm;
+	
 	boolean isAnimating;
 	Context mCtx;
 
 	public GLRenderer(Context parent){
+		super();
 		mCtx = parent;
 		isAnimating = true;
 		transRot = new float[16];
+		transTran = new float[16];
+		transScale = new float[16];
+		cfWorld = new float[16];
 		
 		for (int i=0;i<16;i+=5){
 			cfWorld[i] = 1f;
@@ -40,10 +48,14 @@ public class GLRenderer implements Renderer {
 	}
 	@Override
 	public void onDrawFrame(GL10 gl) {
-		// TODO Auto-generated method stub
 		gl.glClearColor(0, 0, 0, 1f);
 		gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
 		gl.glLoadIdentity();
+		
+		
+		
+		
+		
 		GLU.gluLookAt(gl, 0, 0, 5, 0, 0, 0, 0, 0, 1f); //take a step back...or 5
 		gl.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 		gl.glMultMatrixf(cfWorld, 0);
@@ -75,7 +87,6 @@ public class GLRenderer implements Renderer {
 
 	@Override
 	public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-		// TODO Auto-generated method stub
 		gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
 		gl.glEnableClientState(GL10.GL_NORMAL_ARRAY);
 		gl.glShadeModel(GL10.GL_SMOOTH);

@@ -4,6 +4,7 @@ import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Context;
+import android.content.pm.ActivityInfo;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,19 +13,19 @@ import android.view.WindowManager;
 import android.widget.Button;
 
 public class MainActivity extends Activity {
+	private GLViewer view;
 	private Button button_up;
 	private Button button_down;
 	private Button button_left;
 	private Button button_right;
 	private Button button_rotate;
 
-	private Viewer view;
 	private GLRenderer render;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
+		view = new GLViewer(this);
 
 		/* remove the title bar at the top of screen */
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -33,7 +34,6 @@ public class MainActivity extends Activity {
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, 
 				WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-		view = new Viewer(this);
 		view.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
 		//set layout
 		setContentView(R.layout.activity_main);
@@ -43,6 +43,7 @@ public class MainActivity extends Activity {
 		button_right=(Button)findViewById(R.id.right);
 		button_left=(Button)findViewById(R.id.left);
 		button_rotate=(Button)findViewById(R.id.rotate);
+		
 
 		button_down.setOnClickListener(new View.OnClickListener() {
 
@@ -87,6 +88,17 @@ public class MainActivity extends Activity {
         parent.addView (view, temp);
 	}
 
+	protected void onResume() {
+		super.onResume();
+		view.onResume();
+		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+	//	view.onResume();
+	}
+	
+	protected void onPause() {
+		super.onPause();
+		view.onPause();
+	}
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
@@ -95,8 +107,9 @@ public class MainActivity extends Activity {
 	}
 
 
-	public class Viewer extends GLSurfaceView{
-        public Viewer(Context c){
+	public class GLViewer extends GLSurfaceView{
+		
+        public GLViewer(Context c){
         	super(c);
             render = new GLRenderer(c);
             setRenderer(render);
