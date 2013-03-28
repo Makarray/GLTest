@@ -77,7 +77,7 @@ public class MainActivity extends Activity {
 			}
 		});
 		
-		View v = findViewById(R.id.GLView);
+		View v = findViewById(R.id.textView1);
         ViewGroup parent = (ViewGroup) v.getParent();
 
         view.setLayoutParams(parent.getLayoutParams());
