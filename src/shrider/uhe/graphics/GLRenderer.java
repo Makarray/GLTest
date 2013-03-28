@@ -25,25 +25,28 @@ public class GLRenderer implements Renderer {
 	private float[] transScale;
 	
 	private float[] cfWorld;
+	private float[] cfSquare;
+	private float[] cfPyramid;
 	
 	//short amount=8;
 //	short faces=3;
 	private FloatBuffer bufVer, bufNorm, bufCol;
 	private ShortBuffer bufDraw;
-	ByteBuffer buff;
-	private float[] arrVer = {	.5f,-.5f,0f, 	//0
-								.5f,.5f,0f,	//1
-								-.5f,.5f,0f,	//2
-								-.5f,-.5f,0f,		//3
+	private float[] arrVer = {	-.5f,.5f,0f, 	//0
+								-.5f,-.5f,0f,	//1
+								.5f,-.5f,0f,	//2
+								.5f,.5f,0f,		//3
 								-.5f,.5f,-1f,	//4
 								-.5f,-.5f,-1f,	//5
-								-.6f,-.6f,-1f,	//6
-								-.5f,-.57f,-1f		//7
+								.5f,-.5f,-1f,	//6
+								.5f,.57f,-1f		//7
 							 };
-	private short[] arrDraw = {	0,2,1,
-								0,1,3,
-								7,5,6,
-								7,5,4
+	private short[] arrDraw = {	0,1,2,
+								0,2,3,
+								7,6,5,
+								7,5,4,
+								0,5,1,
+								4,5,0
 							  };
 	private float[] arrNorm = {	-1f,1f,1f,
 								-1f,-1f,1f,
@@ -75,9 +78,13 @@ public class GLRenderer implements Renderer {
 		transTran = new float[16];
 		transScale = new float[16];
 		cfWorld = new float[16];
+		cfSquare = new float[16];
+		cfPyramid = new float[16];
 		
 		for (int i=0;i<16;i+=5){ //everything in here becomes I
 			cfWorld[i] = 1f;
+			cfSquare[i] = 1f;
+			cfPyramid[i] = 1f;
 			transRot[i] = 1f;
 			transTran[i] = 1f;
 			transScale[i] = 1f;
@@ -86,16 +93,12 @@ public class GLRenderer implements Renderer {
 	}
 	@Override
 	public synchronized void onDrawFrame(GL10 gl) {
+		gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
 		gl.glClearColor(1f, .2f, .2f, 1f);
 		gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
 		gl.glLoadIdentity();
 		
-		
-		GLU.gluLookAt(gl, 0, 0, 8,
-				0, 0, 0, 
-				0, 0, 1f); //take a step back...or 8
-		gl.glColor4f(1.0f,1.0f,1.0f,1.0f);
-		cfWorld[4] = .4f;
+		gl.glTranslatef(0, 0, -2f);
 		gl.glMultMatrixf(cfWorld, 0);
 		
 		//begin the actual render
@@ -111,8 +114,10 @@ public class GLRenderer implements Renderer {
 		gl.glColorPointer(4,GL10.GL_FLOAT,0,bufCol);
 		gl.glNormalPointer(GL10.GL_FLOAT, 0, bufNorm);
 		
+		gl.glRotatef(45, 0, 1, 0);
+		gl.glRotatef(45, 1, 0, 0);
 		gl.glDrawElements(GL10.GL_TRIANGLES, arrDraw.length, GL10.GL_UNSIGNED_SHORT, bufDraw);
-		
+		gl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
 		gl.glPopMatrix();
 		
 	}
@@ -156,23 +161,22 @@ public class GLRenderer implements Renderer {
 	}
 
 	private void initArrays(){
-		buff = ByteBuffer.allocateDirect(arrVer.length * 4);
-		buff.order(ByteOrder.nativeOrder());
-		bufVer = buff.asFloatBuffer();
-		buff = ByteBuffer.allocateDirect(arrCol.length * 4);
-		buff.order(ByteOrder.nativeOrder());
-		bufCol = buff.asFloatBuffer();
-		buff = ByteBuffer.allocateDirect(arrNorm.length * 4);
-		buff.order(ByteOrder.nativeOrder());
-		bufNorm = buff.asFloatBuffer();
-		buff = ByteBuffer.allocateDirect(arrDraw.length * 2);
-		buff.order(ByteOrder.nativeOrder());
-		bufDraw = buff.asShortBuffer();
 		
-		
+		ByteBuffer vertexBuf = ByteBuffer.allocateDirect(4*arrVer.length);
+		vertexBuf.order(ByteOrder.nativeOrder());
+		bufVer = vertexBuf.asFloatBuffer();
 		bufVer.put(arrVer);
+		vertexBuf = ByteBuffer.allocateDirect(4*arrCol.length);
+		vertexBuf.order(ByteOrder.nativeOrder());
+		bufCol=vertexBuf.asFloatBuffer();
 		bufCol.put(arrCol);
+		vertexBuf = ByteBuffer.allocateDirect(2*arrDraw.length);
+		vertexBuf.order(ByteOrder.nativeOrder());
+		bufDraw=vertexBuf.asShortBuffer();
 		bufDraw.put(arrDraw);
+		vertexBuf = ByteBuffer.allocateDirect(4*arrNorm.length);
+		vertexBuf.order(ByteOrder.nativeOrder());
+		bufNorm=vertexBuf.asFloatBuffer();
 		bufNorm.put(arrNorm);
         
 		bufVer.position(0);
