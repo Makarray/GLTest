@@ -140,6 +140,13 @@ public class GLRenderer implements Renderer {
 		gl.glTranslatef(0, 0, -2f);
 		gl.glMultMatrixf(cfWorld, 0);
 		
+		gl.glPushMatrix();
+		
+		
+		
+		
+		gl.glPopMatrix();
+		
 		//begin the actual render
 		gl.glPushMatrix();
 		gl.glTranslatef(.3f, .4f, .5f);
