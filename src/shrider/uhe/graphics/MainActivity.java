@@ -14,6 +14,23 @@ import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
+/*******************************************
+ * MainActivity is the entry point of the android application.
+ * This class will set up the OpenGL objects, and also
+ * set up the button listeners.
+ * 
+ * The small buttons will move an object in opengl,
+ * while the radio buttons will change which object is being moved.
+ * 
+ * Radio 1: the world (camera) is moved.
+ * Radio 2: the square is moved.
+ * Radio 3: the pyramid is moved.
+ * Radio 4: the light is moved.
+ * 
+ * The ani button will toggle animation on and off.
+ * 
+ * @author Matthew Shrider and James Uhe
+ *****************************************/
 public class MainActivity extends Activity {
 	private GLViewer view;
 	private Button button_up;
@@ -49,6 +66,7 @@ public class MainActivity extends Activity {
 		Button button_back=(Button)findViewById(R.id.back);
 		Button button_roll=(Button)findViewById(R.id.roll);
 		Button button_tilt=(Button)findViewById(R.id.tilt);
+		Button button_anim=(Button)findViewById(R.id.anim);
 		RadioButton radioWorld = (RadioButton)findViewById(R.id.radio0);
 		RadioButton radioSquare = (RadioButton)findViewById(R.id.radio1);
 		RadioButton radioPyramid = (RadioButton)findViewById(R.id.radio2);
@@ -76,6 +94,12 @@ public class MainActivity extends Activity {
 
 			public void onClick(View v) {
 			render.Click(12);
+			}
+		});
+		button_anim.setOnClickListener(new View.OnClickListener() {
+
+			public void onClick(View v) {
+			render.Click(14);
 			}
 		});
 		button_forward.setOnClickListener(new View.OnClickListener() {
@@ -149,7 +173,6 @@ public class MainActivity extends Activity {
 		super.onResume();
 		view.onResume();
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-	//	view.onResume();
 	}
 	
 	protected void onPause() {

@@ -13,6 +13,15 @@ import android.opengl.Matrix;
 import android.opengl.GLSurfaceView.Renderer;
 import android.opengl.GLU;
 
+
+/*******************************************
+ * GLRenderer is the main class of the android project.
+ * This object will render and animate the GLSurfaceView
+ * 
+ * Note: The small cube is the position of thie Light Source
+ * 
+ * @author Matthew Shrider and James Uhe
+ *****************************************/
 public class GLRenderer implements Renderer {
 	
 	GL10 gl;
@@ -96,10 +105,10 @@ public class GLRenderer implements Renderer {
 			2,3,4
 		  };
 	private float[] arrNormT = {	0,1f,0
-			-1f,-1f,1f,
-			1f,-1f,1f,
-			-1f,-1f,-1f,
-			1f,-1f,-1f
+			-.5f,0f,.5f,
+			.5f,0f,.5f,
+			-.5f,0f,-.5f,
+			.5f,0f,-.5f
 			};
 	private float[] arrColT = {	1f,0,0,1f,
 			0,1f,0,1f,
@@ -108,6 +117,7 @@ public class GLRenderer implements Renderer {
 			1f,0,1f,1f,
 		 };
 	boolean isAnimating = true;
+	int currFrame = 0;
 	Context mCtx;
 
 	public GLRenderer(Context parent){
@@ -143,15 +153,26 @@ public class GLRenderer implements Renderer {
 		gl.glTranslatef(0, 0, -2f);
 		gl.glMultMatrixf(cfWorld, 0);
 		
+		gl.glPushMatrix();
 		if (isAnimating){
-			gl.glPushMatrix();
+			if (currFrame<10){
+				Matrix.rotateM(cfSquare, 0,36, 0, 1,0);
+				Matrix.translateM(cfSquare, 0, 0f, .15f, 0f);
+			}else {
+				Matrix.rotateM(cfSquare, 0,36, 0, 1,0);
+				Matrix.translateM(cfSquare, 0, 0f, -.15f, 0f);
+			}
+			currFrame++;
+			if (currFrame >=20)
+				currFrame=0;
 			
-			gl.glPopMatrix();
 		}
+		gl.glPopMatrix();
 		
 		//begin the actual render
 		gl.glPushMatrix();
 		gl.glMultMatrixf(cfLight, 0);
+		gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_POSITION, light0Pos, 0);
 		gl.glPushMatrix();
 		gl.glScalef(.2f, .2f, .2f);
 		gl.glMaterialfv(GL10.GL_FRONT, GL10.GL_DIFFUSE, matDif, 0);
@@ -163,11 +184,10 @@ public class GLRenderer implements Renderer {
 		gl.glNormalPointer(GL10.GL_FLOAT, 0, bufNorm);
 		//draw square
 		gl.glTranslatef(0f, 0f, -2f);
-		gl.glMultMatrixf(cfSquare,0);
 		gl.glDrawElements(GL10.GL_TRIANGLES, arrDraw.length, GL10.GL_UNSIGNED_SHORT, bufDraw);
 		gl.glPopMatrix();
-		gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_POSITION, light0Pos, 0);
 		gl.glPopMatrix();
+		
 		
 		gl.glEnable(GL10.GL_COLOR_MATERIAL);
 		gl.glEnableClientState(GL10.GL_COLOR_ARRAY);
