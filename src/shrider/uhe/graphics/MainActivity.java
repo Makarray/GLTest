@@ -11,6 +11,8 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 
 public class MainActivity extends Activity {
 	private GLViewer view;
@@ -43,37 +45,92 @@ public class MainActivity extends Activity {
 		button_right=(Button)findViewById(R.id.right);
 		button_left=(Button)findViewById(R.id.left);
 		button_rotate=(Button)findViewById(R.id.rotate);
+		Button button_forward=(Button)findViewById(R.id.forward);
+		Button button_back=(Button)findViewById(R.id.back);
+		Button button_roll=(Button)findViewById(R.id.roll);
+		Button button_tilt=(Button)findViewById(R.id.tilt);
+		RadioButton radioWorld = (RadioButton)findViewById(R.id.radio0);
+		RadioButton radioSquare = (RadioButton)findViewById(R.id.radio1);
+		RadioButton radioPyramid = (RadioButton)findViewById(R.id.radio2);
+		RadioButton radioLight = (RadioButton)findViewById(R.id.lightBut);
 		
+		radioWorld.setOnClickListener(new View.OnClickListener() {
 
+			public void onClick(View v) {
+			render.Click(7);
+			}
+		});
+		radioSquare.setOnClickListener(new View.OnClickListener() {
+
+			public void onClick(View v) {
+			render.Click(8);
+			}
+		});
+		radioPyramid.setOnClickListener(new View.OnClickListener() {
+
+			public void onClick(View v) {
+			render.Click(9);
+			}
+		});
+		radioLight.setOnClickListener(new View.OnClickListener() {
+
+			public void onClick(View v) {
+			render.Click(12);
+			}
+		});
+		button_forward.setOnClickListener(new View.OnClickListener() {
+
+			public void onClick(View v) {
+			render.Click(0);
+			}
+		});
+		button_back.setOnClickListener(new View.OnClickListener() {
+
+			public void onClick(View v) {
+			render.Click(1);
+			}
+		});
 		button_down.setOnClickListener(new View.OnClickListener() {
 
 			public void onClick(View v) {
-			//	render.Down();
+			render.Click(10);
 			}
 		});
 		button_up.setOnClickListener(new View.OnClickListener() {
 
 			public void onClick(View v) {
-			//	render.Up();
+			render.Click(11);
 			}
 		});
 		button_left.setOnClickListener(new View.OnClickListener() {
 
 			public void onClick(View v) {
-			//	render.Left();
+			render.Click(2);
 			}
 		});
 		button_right.setOnClickListener(new View.OnClickListener() {
 
 			public void onClick(View v) {
-			//	render.Right();
+			render.Click(3);
 			}
 		});
 		button_rotate.setOnClickListener(new View.OnClickListener() {
 
 			public void onClick(View v) {
-			//	render.Rotate();
+			render.Click(5);
 
+			}
+		});
+		button_roll.setOnClickListener(new View.OnClickListener() {
+
+			public void onClick(View v) {
+			render.Click(6);
+			}
+		});
+		button_tilt.setOnClickListener(new View.OnClickListener() {
+
+			public void onClick(View v) {
+			render.Click(4);
 			}
 		});
 		

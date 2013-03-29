@@ -9,13 +9,16 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 import android.content.Context;
+import android.opengl.Matrix;
 import android.opengl.GLSurfaceView.Renderer;
 import android.opengl.GLU;
 
 public class GLRenderer implements Renderer {
+	
+	GL10 gl;
 
-	private float[] light0Amb = {.4f, .4f, .4f, 1f};
-	private float[] light0Dif = {1f, 1f, 1f, 1f};
+	private float[] light0Amb = {.4f, .4f, .4f, .3f};
+	private float[] light0Dif = {1f, 1f, 1f, .7f};
 	private float[] light0Pos = {0f, 0f, 0f, 1f};
 	private float[] matAmb = {.3f, .3f, .3f, .5f};
 	private float[] matDif = {0f,.3f,.1f,.5f};
@@ -31,9 +34,9 @@ public class GLRenderer implements Renderer {
 	private float[] cfWorld;
 	private float[] cfSquare;
 	private float[] cfPyramid;
+	private float[] cfLight;
+	private float[] currMatrix = cfWorld;
 	
-	//short amount=8;
-//	short faces=3;
 	private FloatBuffer bufVer, bufNorm, bufCol;
 	private ShortBuffer bufDraw;
 	private FloatBuffer bufVerT, bufNormT, bufColT;
@@ -104,7 +107,7 @@ public class GLRenderer implements Renderer {
 			1f,1f,0,1f,
 			1f,0,1f,1f,
 		 };
-	boolean isAnimating;
+	boolean isAnimating = true;
 	Context mCtx;
 
 	public GLRenderer(Context parent){
@@ -117,11 +120,13 @@ public class GLRenderer implements Renderer {
 		cfWorld = new float[16];
 		cfSquare = new float[16];
 		cfPyramid = new float[16];
+		cfLight = new float[16];
 		
 		for (int i=0;i<16;i+=5){ //everything in here becomes I
 			cfWorld[i] = 1f;
 			cfSquare[i] = 1f;
 			cfPyramid[i] = 1f;
+			cfLight[i] = 1f;
 			transRot[i] = 1f;
 			transTran[i] = 1f;
 			transScale[i] = 1f;
@@ -133,28 +138,41 @@ public class GLRenderer implements Renderer {
 		gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
 		gl.glClearColor(.1f, .1f, .1f, 1f);
 		gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
+		
 		gl.glLoadIdentity();
-		
-		gl.glRotatef(90, 0, 0, 1);
-		
 		gl.glTranslatef(0, 0, -2f);
 		gl.glMultMatrixf(cfWorld, 0);
 		
-		gl.glPushMatrix();
-		
-		
-		
-		
-		gl.glPopMatrix();
+		if (isAnimating){
+			gl.glPushMatrix();
+			
+			gl.glPopMatrix();
+		}
 		
 		//begin the actual render
 		gl.glPushMatrix();
-		gl.glTranslatef(.3f, .4f, .5f);
+		gl.glMultMatrixf(cfLight, 0);
+		gl.glPushMatrix();
+		gl.glScalef(.2f, .2f, .2f);
+		gl.glMaterialfv(GL10.GL_FRONT, GL10.GL_DIFFUSE, matDif, 0);
+		gl.glMaterialfv(GL10.GL_FRONT, GL10.GL_SPECULAR, matSpec, 0);
+		gl.glMaterialfv(GL10.GL_FRONT, GL10.GL_AMBIENT, matAmb, 0);
+		
+		gl.glVertexPointer(3,GL10.GL_FLOAT,0,bufVer);
+		gl.glColorPointer(4,GL10.GL_FLOAT,0,bufCol);
+		gl.glNormalPointer(GL10.GL_FLOAT, 0, bufNorm);
+		//draw square
+		gl.glTranslatef(0f, 0f, -2f);
+		gl.glMultMatrixf(cfSquare,0);
+		gl.glDrawElements(GL10.GL_TRIANGLES, arrDraw.length, GL10.GL_UNSIGNED_SHORT, bufDraw);
+		gl.glPopMatrix();
 		gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_POSITION, light0Pos, 0);
 		gl.glPopMatrix();
 		
 		gl.glEnable(GL10.GL_COLOR_MATERIAL);
 		gl.glEnableClientState(GL10.GL_COLOR_ARRAY);
+		
+		
 		gl.glPushMatrix();
 		gl.glMaterialfv(GL10.GL_FRONT, GL10.GL_DIFFUSE, matDif, 0);
 		gl.glMaterialfv(GL10.GL_FRONT, GL10.GL_SPECULAR, matSpec, 0);
@@ -174,11 +192,9 @@ public class GLRenderer implements Renderer {
 		gl.glMaterialfv(GL10.GL_FRONT, GL10.GL_DIFFUSE, matDifT, 0);
 		gl.glMaterialfv(GL10.GL_FRONT, GL10.GL_SPECULAR, matSpecT, 0);
 		gl.glMaterialfv(GL10.GL_FRONT, GL10.GL_AMBIENT, matAmbT, 0);
-		
 		gl.glVertexPointer(3,GL10.GL_FLOAT,0,bufVerT);
 		gl.glColorPointer(4,GL10.GL_FLOAT,0,bufColT);
 		gl.glNormalPointer(GL10.GL_FLOAT, 0, bufNormT);
-		
 		//draw triangle
 		gl.glMultMatrixf(cfPyramid,0);
 		gl.glDrawElements(GL10.GL_TRIANGLES, arrDrawT.length, GL10.GL_UNSIGNED_SHORT, bufDrawT);
@@ -201,6 +217,7 @@ public class GLRenderer implements Renderer {
 
 	@Override
 	public void onSurfaceCreated(GL10 gl, EGLConfig config) {
+		this.gl = gl;
 		gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
 		gl.glEnableClientState(GL10.GL_NORMAL_ARRAY);
 		gl.glShadeModel(GL10.GL_SMOOTH);
@@ -210,6 +227,8 @@ public class GLRenderer implements Renderer {
 		gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_AMBIENT, light0Amb, 0);
 		gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_DIFFUSE, light0Dif, 0);
 		gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_POSITION, light0Pos, 0);
+		gl.glLightf(GL10.GL_LIGHT0, GL10.GL_LINEAR_ATTENUATION, .5f);
+		gl.glLightf(GL10.GL_LIGHT0, GL10.GL_LINEAR_ATTENUATION, .1f);
 		
 		gl.glLightModelfv(GL10.GL_LIGHT_MODEL_AMBIENT, light0Amb, 0);
 		
@@ -217,6 +236,8 @@ public class GLRenderer implements Renderer {
 		gl.glEnable(GL10.GL_DEPTH_TEST);
 		
 		initArrays();
+		
+		currMatrix = cfWorld;
 		
 	}
 
@@ -265,5 +286,70 @@ public class GLRenderer implements Renderer {
 		bufColT.position(0);
 		bufNormT.position(0);
 		bufDrawT.position(0);
+	}
+	public void setMatrix(int i){
+		switch(i){
+		case(0):
+			currMatrix = cfWorld;
+		break;
+		case(1):
+			currMatrix = cfSquare;
+		break;
+		case(2):
+			currMatrix = cfPyramid;
+		break;
+		}
+	}
+	
+	public void Click(int i){
+		switch(i){
+		case 0://for
+			Matrix.translateM(currMatrix, 0, 0, 0, .2f);
+			break;
+		case 1://bak
+			Matrix.translateM(currMatrix, 0, 0, 0, -.2f);
+			break;
+		case 2://left
+			Matrix.translateM(currMatrix, 0, -.2f, 0, 0);
+			break;
+		case 3://rig
+			Matrix.translateM(currMatrix, 0, .2f, 0, 0);
+			break;
+		case 4://tilkt
+			gl.glPushMatrix();
+			Matrix.rotateM(currMatrix, 0, 18f,1, 0, 0);
+			gl.glPopMatrix();
+			break;
+		case 5://turnright
+			gl.glPushMatrix();
+			Matrix.rotateM(currMatrix, 0, 18f, 0, 1, 0);
+			gl.glPopMatrix();
+			break;
+		case 6://Roll
+			gl.glPushMatrix();
+			Matrix.rotateM(currMatrix, 0, 18f, 0, 0, 1);
+			gl.glPopMatrix();
+			break;
+		case 7://Set World
+			currMatrix = cfWorld;
+			break;
+		case 8://Set Square
+			currMatrix = cfSquare;
+			break;
+		case 9://Set Pyramid
+			currMatrix = cfPyramid;
+			break;
+		case 10://down
+			Matrix.translateM(currMatrix, 0, 0, -.2f, 0);
+			break;
+		case 11:
+			Matrix.translateM(currMatrix, 0, 0, .2f, 0);
+			break;
+		case 12:
+			currMatrix = cfLight;
+			break;
+		case 14:
+			isAnimating = !isAnimating;
+		}
 	}
 }
