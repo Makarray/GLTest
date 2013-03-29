@@ -48,31 +48,36 @@ public class MainActivity extends Activity {
 		button_down.setOnClickListener(new View.OnClickListener() {
 
 			public void onClick(View v) {
-			//	render.Down();
+				render.Click('1',view);
+				view.requestRender();
 			}
 		});
 		button_up.setOnClickListener(new View.OnClickListener() {
 
 			public void onClick(View v) {
-			//	render.Up();
+				render.Click('0',view);
+				view.requestRender();
 			}
 		});
 		button_left.setOnClickListener(new View.OnClickListener() {
 
 			public void onClick(View v) {
-			//	render.Left();
+				render.Click('3',view);
+				view.requestRender();
 			}
 		});
 		button_right.setOnClickListener(new View.OnClickListener() {
 
 			public void onClick(View v) {
-			//	render.Right();
+				render.Click('2',view);
+				view.requestRender();
 			}
 		});
 		button_rotate.setOnClickListener(new View.OnClickListener() {
 
 			public void onClick(View v) {
-			//	render.Rotate();
+				render.Click('4',view);
+				view.requestRender();
 
 			}
 		});
@@ -115,6 +120,8 @@ public class MainActivity extends Activity {
             setRenderer(render);
             setRenderMode(RENDERMODE_CONTINUOUSLY);
         }
+        
+        
         		
 	}
 }
